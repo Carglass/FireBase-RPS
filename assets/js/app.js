@@ -28,11 +28,14 @@ database.ref('sessions').on("child_added", function(snapshot){
         $('#session-control').hide();
         $('#current-game').text('Waiting for a worthy opponent');
     } else {
-        console.log('meeeeeerde');
+        let sessionName = $('<div>' + snapshot.val().creator.displayName + ' session</div>');
+        let joinButton = $('<button>Join Game</button>');
+        $('#open-sessions').append(sessionName).append(joinButton);
     }
 });
 
 $(document).ready(function(){
+    // signup button
     $(document).on('click', '#signup-button', function (event) {
         let name = $('#signup-name').val();
         let email = $('#signup-email').val();
@@ -47,6 +50,7 @@ $(document).ready(function(){
           });
     });
 
+    // logout button
     $(document).on('click', '#logout-button', function (event) {
         firebase.auth().signOut().then(function() {
             console.log('logout successful');
@@ -55,6 +59,7 @@ $(document).ready(function(){
           });
     });
 
+    //login button
     $(document).on('click', '#login-button', function (event) {
         let email = $('#login-email').val();
         let password = $('#login-password').val();
@@ -66,6 +71,7 @@ $(document).ready(function(){
           });
     });
 
+    // create session button
     $(document).on('click','#session-control', function(event){
         let session = {
             'creator': {
