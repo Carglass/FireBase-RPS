@@ -1,7 +1,8 @@
 let database = firebase.database();
-let userName = '';
-let userId = '';
 
+var STATE = {OPEN: 1, CLOSED:2}
+
+//listener on connection/disconnection
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
         console.log(user.uid);
@@ -10,11 +11,24 @@ firebase.auth().onAuthStateChanged(function (user) {
         $('#signup').hide();
         $('#login').hide();
         $('#logout').show();
+        $('#session-control').show();
     } else {
         $('#login-status').text('not logged in :(');
         $('#signup').show();
         $('#login').show();
         $('#logout').hide();
+        $('#session-control').hide();
+    }
+});
+
+//listener on new game session created
+database.ref('sessions').on("child_added", function(snapshot){
+    let creatorUid = snapshot.val().creator.uid;
+    if (creatorUid === firebase.auth().currentUser.uid){
+        $('#session-control').hide();
+        $('#current-game').text('Waiting for a worthy opponent');
+    } else {
+        console.log('meeeeeerde');
     }
 });
 
@@ -52,6 +66,15 @@ $(document).ready(function(){
           });
     });
 
-    
+    $(document).on('click','#session-control', function(event){
+        let session = {
+            'creator': {
+                'displayName': firebase.auth().currentUser.displayName,
+                'uid': firebase.auth().currentUser.uid,
+            },
+            state: STATE.OPEN,
+        }
+        database.ref('sessions').push(session);
+    });
 
 });
