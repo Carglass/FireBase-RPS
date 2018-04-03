@@ -1,6 +1,27 @@
 let database = firebase.database();
 
-var STATE = {OPEN: 1, CLOSED:2}
+var APP_STATE = {
+    LOGIN: 1,
+    SIGNUP: 2,
+    SESSIONS: 3,
+    SESSION_WAITING:4,
+    GAME: 5,
+    GAME_WAITING: 6,
+    GAME_RESULTS: 7,
+}
+
+var app_view = {
+    state: 1,
+    render: function(){
+        //TODO: write it
+    },
+    setState: function(newState){
+        this.state = newState;
+        this.render();
+    }
+}
+
+var GAME_STATE = {OPEN: 1, CLOSED:2}
 
 //listener on connection/disconnection
 firebase.auth().onAuthStateChanged(function (user) {
@@ -22,6 +43,7 @@ firebase.auth().onAuthStateChanged(function (user) {
 });
 
 //listener on new game session created
+//TODO: [NICE TO HAVE] should there be a filter on game that are OPEN ? for the case of a user who connects later
 database.ref('sessions').on("child_added", function(snapshot){
     let creatorUid = snapshot.val().creator.uid;
     if (creatorUid === firebase.auth().currentUser.uid){
@@ -33,6 +55,17 @@ database.ref('sessions').on("child_added", function(snapshot){
         $('#open-sessions').append(sessionName).append(joinButton);
     }
 });
+
+
+
+//listener
+
+//TODO: listener on session closed to display game UI to both players
+//TODO: [NICE TO HAVE] listener should also somehow filters this session from the render for the other players
+//TODO: action that commit the choice
+//TODO: listener on choice, that triggers the result display
+//TODO: clicking on quit session brings back to the menu
+//TODO: once both users have clicked on the session, the session is killed
 
 $(document).ready(function(){
     // signup button
@@ -78,11 +111,12 @@ $(document).ready(function(){
                 'displayName': firebase.auth().currentUser.displayName,
                 'uid': firebase.auth().currentUser.uid,
             },
-            state: STATE.OPEN,
+            state: GAME_STATE.OPEN,
         }
         database.ref('sessions').push(session);
     });
 
+    // join session button
     $(document).on('click','.join-button', function(event){
         let sessionUid = $(event.target).attr('id');
         let joiner = {
@@ -90,7 +124,7 @@ $(document).ready(function(){
             'uid': firebase.auth().currentUser.uid,
         };
         database.ref('sessions/' + sessionUid + '/joiner').set(joiner);
-        database.ref('sessions/' + sessionUid + '/state').set(STATE.CLOSED);
+        database.ref('sessions/' + sessionUid + '/state').set(GAME_STATE.CLOSED);
     });
 
 });
