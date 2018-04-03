@@ -1,77 +1,187 @@
 let database = firebase.database();
 
-var APP_STATE = {
+var LOGIN_STATE = {
     LOGIN: 1,
     SIGNUP: 2,
-    SESSIONS: 3,
-    SESSION_WAITING:4,
-    GAME: 5,
-    GAME_WAITING: 6,
-    GAME_RESULTS: 7,
+    LOGGED: 3,
+}
+
+var MAIN_APP_STATE = {
+    SESSIONS: 1,
+    WAITING_JOINER: 2,
+    GAME: 3,
+    WAITING_CHOICE: 4,
+    GAME_RESULTS: 5,
 }
 
 var app_view = {
-    state: 1,
+    loginState: 1,
+    appState: 1,
     render: function(){
+        let signup = $('#signup');
+        let login = $('#login');
+        let mainApp = $('#main-app');
+        let sessions = $('#session-control');
+        let waitingJoiner = $('#waiting-joiner')
+        let game = $('#current-game');
+        let waitingChoice = $('#waiting-choice');
+        let gameResults = $('#game-results');
         //TODO: write it
+        if (this.loginState === 1){
+            signup.hide();
+            login.show();
+            mainApp.hide();
+            sessions.hide();
+            waitingJoiner.hide();
+            game.hide();
+            waitingChoice.hide();
+            gameResults.hide();
+        } else if (this.loginState === 2) {
+            signup.show();
+            login.hide();
+            mainApp.hide();
+            sessions.hide();
+            waitingJoiner.hide();
+            game.hide();
+            waitingChoice.hide();
+            gameResults.hide();
+        } else if (this.loginState === 3) {
+            signup.hide();
+            login.hide();
+            mainApp.show();
+            if (this.appState === 1){
+                sessions.show();
+                waitingJoiner.hide();
+                game.hide();
+                waitingChoice.hide();
+                gameResults.hide();
+            } else if (this.appState === 2){
+                sessions.hide();
+                waitingJoiner.show();
+                game.hide();
+                waitingChoice.hide();
+                gameResults.hide();
+            } else if (this.appState === 3){
+                sessions.hide();
+                waitingJoiner.hide();
+                game.show();
+                waitingChoice.hide();
+                gameResults.hide();
+            } else if (this.appState === 4){
+                sessions.hide();
+                waitingJoiner.hide();
+                game.hide();
+                waitingChoice.show();
+                gameResults.hide();
+            } else if (this.appState === 5){
+                sessions.hide();
+                waitingJoiner.hide();
+                game.hide();
+                waitingChoice.hide();
+                gameResults.show();
+            }
+        }
     },
-    setState: function(newState){
-        this.state = newState;
+    setLoginState: function(newState){
+        this.loginState = newState;
+        this.render();
+    },
+    setAppState:function(newState){
+        this.appState = newState;
         this.render();
     }
 }
 
-var GAME_STATE = {OPEN: 1, CLOSED:2}
+var GAME_STATE = {
+    OPEN: 1, 
+    CLOSED:2,
+}
+
+var user = {
+    uid: '',
+    role: '',
+    choice: '',
+    sessionuid: '',
+}
+
+var opponent = {
+    role: '',
+    hasChosen: false,
+    choice: '',
+}
+
 
 //listener on connection/disconnection
-firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-        console.log(user.uid);
-        console.log(firebase.auth().currentUser.displayName);
+firebase.auth().onAuthStateChanged(function (loggedUser) {
+    if (loggedUser) {
+        user.uid = loggedUser.uid;
         $('#current-user').text(firebase.auth().currentUser.displayName + ' is connected');
-        $('#signup').hide();
-        $('#login').hide();
-        $('#logout').show();
-        $('#session-control').show();
+        app_view.setLoginState(LOGIN_STATE.LOGGED);
+        app_view.setAppState(MAIN_APP_STATE.SESSIONS);
+        listenToSessions();
+        listenToSessionsChanges();
     } else {
-        $('#login-status').text('not logged in :(');
-        $('#signup').show();
-        $('#login').show();
-        $('#logout').hide();
-        $('#session-control').hide();
+        app_view.setLoginState(LOGIN_STATE.LOGIN);
+        user.uid = '';
+        user.role = '';
+        user.choice = '';
+        opponent.role = '';
+        opponent.hasChosen = false;
+        opponent.choice = '';
     }
 });
 
 //listener on new game session created
+//FIXME: right after a game is created, if another user logs from the same computer, he can still log somehow
 //TODO: [TO TEST] should there be a filter on game that are OPEN ? for the case of a user who connects later
-database.ref('sessions').on("child_added", function(snapshot){
-    let creatorUid = snapshot.val().creator.uid;
-    if (snapshot.val().state === 1){
-        if (creatorUid === firebase.auth().currentUser.uid){
-            $('#session-control').hide();
-            $('#current-game').text('Waiting for a worthy opponent');
-        } else {
-            let sessionName = $('<div>' + snapshot.val().creator.displayName + ' session</div>');
-            let joinButton = $('<button></button>').attr('id', snapshot.key).text('join Session').addClass('join-button');
-            $('#open-sessions').append(sessionName).append(joinButton);
+function listenToSessions(){
+    database.ref('sessions').on("child_added", function(snapshot){
+        console.log(snapshot.val());
+        let creatorUid = snapshot.val().creator.uid;
+        console.log(creatorUid);
+        if (snapshot.val().state === 1){
+            if (creatorUid === firebase.auth().currentUser.uid){
+                user.role = 'creator';
+                user.sessionuid = snapshot.key;
+                app_view.setAppState(MAIN_APP_STATE.WAITING_JOINER);
+            } else {
+                let sessionName = $('<div>' + snapshot.val().creator.displayName + ' session</div>');
+                let joinButton = $('<button></button>').attr('id', snapshot.key).text('join Session').addClass('join-button');
+                $('#open-sessions').append(sessionName).append(joinButton);
+            }
+        } else if (snapshot.val().state === 2){
+            let joinerUid = snapshot.val().joiner.uid;
+            if (creatorUid === user.uid || joinerUid === user.uid){
+                user.role = (creatorUid === user.uid ? 'creator' : 'joiner');
+                opponent.role = (creatorUid === user.uid ? 'joiner' : 'creator');
+                user.sessionuid = snapshot.key;
+                app_view.setAppState(MAIN_APP_STATE.GAME);
+            }
         }
-    }
-});
+    });
+}
 
 
 
 //listener on session closed, has to be on child_changed on session, to access the siblings
-database.ref('sessions').on("child_changed", function(snapshot){
+function listenToSessionsChanges (){
+    database.ref('sessions').on("child_changed", function(snapshot){
     let creatorUid = snapshot.val().creator.uid;
     let joinerUid = snapshot.val().joiner.uid;
     if (snapshot.val().state === 2){
-        if (creatorUid === firebase.auth().currentUser.uid){
-            //TODO: displays the game controls
-        } else if (joinerUid === firebase.auth().currentUser.uid){
+        if (creatorUid === user.uid){
+            user.role = 'creator';
+            opponent.role = 'joiner';
+            app_view.setAppState(MAIN_APP_STATE.GAME);
+        } else if (joinerUid === user.uid){
+            user.role = 'joiner';
+            opponent.role = 'creator';
+            app_view.setAppState(MAIN_APP_STATE.GAME);
             // displays the game controls
         } //TODO: is it possible here to say to hide the session ?
     } 
-});
+    });
+}
 
 //TODO: listener on session closed to display game UI to both players
 //TODO: [NICE TO HAVE] listener should also somehow filters this session from the render for the other players
@@ -81,7 +191,19 @@ database.ref('sessions').on("child_changed", function(snapshot){
 //TODO: once both users have clicked on the session, the session is killed
 
 $(document).ready(function(){
-    // signup button
+
+    //-----------------//
+    // signup controls //
+    //-----------------//
+
+    $(document).on('click','#signup-open',function(event){
+        app_view.setLoginState(LOGIN_STATE.SIGNUP);
+    });
+
+    $(document).on('click','#signup-close',function(event){
+        app_view.setLoginState(LOGIN_STATE.LOGIN);
+    });
+
     $(document).on('click', '#signup-button', function (event) {
         let name = $('#signup-name').val();
         let email = $('#signup-email').val();
@@ -93,8 +215,15 @@ $(document).ready(function(){
             console.log(errorCode + '   ' + errorMessage);
           }).then(function(user){
               user.updateProfile({displayName: name});
+              $('#signup-name').val('');
+              $('#signup-email').val('');
+              $('#signup-password').val('');
           });
     });
+
+    //---------------//
+    // LOGIN CONTROL //
+    //---------------//
 
     // logout button
     $(document).on('click', '#logout-button', function (event) {
@@ -117,12 +246,17 @@ $(document).ready(function(){
           });
     });
 
+    //------------------//
+    // SESSION CONTROLS //
+    //------------------//
+
     // create session button
     $(document).on('click','#create-game', function(event){
         let session = {
             'creator': {
                 'displayName': firebase.auth().currentUser.displayName,
                 'uid': firebase.auth().currentUser.uid,
+                'choice': '',
             },
             state: GAME_STATE.OPEN,
         }
@@ -135,9 +269,20 @@ $(document).ready(function(){
         let joiner = {
             'displayName': firebase.auth().currentUser.displayName,
             'uid': firebase.auth().currentUser.uid,
+            'choice': '',
         };
         database.ref('sessions/' + sessionUid + '/joiner').set(joiner);
         database.ref('sessions/' + sessionUid + '/state').set(GAME_STATE.CLOSED);
+    });
+
+    //---------------//
+    // GAME CONTROLS //
+    //---------------//
+
+    $(document).on('click','#confirm-choice', function(){
+        user.choice = $('#rps-choice').val();
+        console.log(user.choice);
+        database.ref('sessions/' + user.sessionuid + '/' + user.role + '/choice').set(user.choice);
     });
 
 });

@@ -7,39 +7,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <div id="auth-control">
-        <div id="signup">
-            <div>Name: <input type="text" id="signup-name"></div>
-            <div>Email: <input type="email" id="signup-email"></div>
-            <div>Password: <input type="password" id="signup-password"></div>
-            <button id="signup-button">Sign Up</button>
-        </div>
+    <!-- signup page -->
+    <div id="signup">
+        <button id="signup-close">Back to login</button>
+        <div>Name: <input type="text" id="signup-name"></div>
+        <div>Email: <input type="email" id="signup-email"></div>
+        <div>Password: <input type="password" id="signup-password"></div>
+        <button id="signup-button">Sign Up</button>
+    </div>
+
     
+
+    <!-- login page  -->
+    <div id="login">
+        <input type="email" id="login-email">
+        <input type="password" id="login-password">
+        <button id="login-button">Login</button>
+        <button id="signup-open">Sign Up</button>
+    </div>
+
+    <!-- main app -->
+    <div id="main-app">
         <div id="logout">
             <div id="current-user"></div>
             <button id="logout-button">Logout</button>
         </div>
-    
-        <div id="login">
-            <input type="email" id="login-email">
-            <input type="password" id="login-password">
-            <button id="login-button">Login</button>
+        <!-- sessions -->
+        <div id="session-control">
+            <button id="create-game">Create Game</button>
+            <div id="open-sessions"></div>
         </div>
+        <!-- in sessions, waiting for joiner -->
+        <div id="waiting-joiner">Waiting for someone to join</div>
+        <!-- in game -->
+        <div id="current-game">
+            <select id="rps-choice">
+                <option value="rock">Rock</option>
+                <option value="paper">Paper</option>
+                <option value="scisors">Scisors</option>
+            </select>
+            <button id="confirm-choice">Confirm</button>
+            <div id="opponent-awaits"></div>
+        </div>
+        <!-- in game, waiting for the other to choose -->
+        <div id="waiting-choice"></div>
+        <!-- game results -->
+        <div id="game-results"></div>
     </div>
 
-    <div id="session-control">
-        <button id="create-game">Create Game</button>
-        <div id="open-sessions"></div>
-    </div>
-
-    <div id="current-game">
-        <select id="rps-choice">
-            <option value="rock">Rock</option>
-            <option value="paper">Paper</option>
-            <option value="scisors">Scisors</option>
-        </select>
-    </div>
-
+    
     <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
     <script>
     // Initialize Firebase
