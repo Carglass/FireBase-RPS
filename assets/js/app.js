@@ -43,22 +43,35 @@ firebase.auth().onAuthStateChanged(function (user) {
 });
 
 //listener on new game session created
-//TODO: [NICE TO HAVE] should there be a filter on game that are OPEN ? for the case of a user who connects later
+//TODO: [TO TEST] should there be a filter on game that are OPEN ? for the case of a user who connects later
 database.ref('sessions').on("child_added", function(snapshot){
     let creatorUid = snapshot.val().creator.uid;
-    if (creatorUid === firebase.auth().currentUser.uid){
-        $('#session-control').hide();
-        $('#current-game').text('Waiting for a worthy opponent');
-    } else {
-        let sessionName = $('<div>' + snapshot.val().creator.displayName + ' session</div>');
-        let joinButton = $('<button></button>').attr('id', snapshot.key).text('join Session').addClass('join-button');
-        $('#open-sessions').append(sessionName).append(joinButton);
+    if (snapshot.val().state === 1){
+        if (creatorUid === firebase.auth().currentUser.uid){
+            $('#session-control').hide();
+            $('#current-game').text('Waiting for a worthy opponent');
+        } else {
+            let sessionName = $('<div>' + snapshot.val().creator.displayName + ' session</div>');
+            let joinButton = $('<button></button>').attr('id', snapshot.key).text('join Session').addClass('join-button');
+            $('#open-sessions').append(sessionName).append(joinButton);
+        }
     }
 });
 
 
 
-//listener
+//listener on session closed, has to be on child_changed on session, to access the siblings
+database.ref('sessions').on("child_changed", function(snapshot){
+    let creatorUid = snapshot.val().creator.uid;
+    let joinerUid = snapshot.val().joiner.uid;
+    if (snapshot.val().state === 2){
+        if (creatorUid === firebase.auth().currentUser.uid){
+            //TODO: displays the game controls
+        } else if (joinerUid === firebase.auth().currentUser.uid){
+            // displays the game controls
+        } //TODO: is it possible here to say to hide the session ?
+    } 
+});
 
 //TODO: listener on session closed to display game UI to both players
 //TODO: [NICE TO HAVE] listener should also somehow filters this session from the render for the other players
