@@ -187,6 +187,8 @@ function listenToSessionsChanges (){
 
 function showGameResults(){
     console.log('game has ended');
+    console.log(user.choice);
+    console.log(opponent.choice);
     if (user.choice === 'rock'){
         if (opponent.choice === 'rock'){
             return 'draw';
@@ -215,6 +217,7 @@ function showGameResults(){
 }
 
 function displayResult(winner){
+    console.log(user);
     if (winner === 'user'){
         $('#game-results').text('You Win!');
     } else if (winner === 'opponent'){
