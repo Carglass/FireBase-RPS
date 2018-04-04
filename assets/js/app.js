@@ -183,6 +183,94 @@ function listenToSessionsChanges (){
     });
 }
 
+function showGameResults(){
+    console.log('game has ended');
+    if (user.choice === 'rock'){
+        if (opponent.choice === 'rock'){
+            return 'draw';
+        } else if (opponent.choice === 'paper'){
+            return 'opponent';
+        } else if (opponent.choice === 'scisors'){
+            return 'user';
+        }
+    } else if (user.choice === 'paper'){
+        if (opponent.choice === 'rock'){
+            return 'user';
+        } else if (opponent.choice === 'paper'){
+            return 'draw';
+        } else if (opponent.choice === 'scisors'){
+            return 'opponent';
+        }
+    } else if (user.choice === 'scisors'){
+        if (opponent.choice === 'rock'){
+            return 'opponent';
+        } else if (opponent.choice === 'paper'){
+            return 'user';
+        } else if (opponent.choice === 'scisors'){
+            return 'draw';
+        }
+    } 
+}
+
+function displayResult(winner){
+    if (winner === 'user'){
+        $('#game-results').text('You Win!');
+    } else if (winner === 'opponent'){
+        $('#game-results').text('You lost :(');
+    } else if (winner === 'draw'){
+        $('#game-results').text('Draw!');
+    }
+    app_view.setAppState(MAIN_APP_STATE.GAME_RESULTS);
+}
+
+function listenToChoices(){
+    database.ref('sessions/' + user.sessionuid + '/joiner/choice').on('value',function(snapshot){
+        if (snapshot.val() !== ''){
+            if (user.role === 'joiner'){
+                user.choice = snapshot.val();
+                if (opponent.choice !== ''){
+                    console.log('run');
+                    displayResult(showGameResults());
+                } else {
+                    console.log('run');
+                    app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+                }
+            } else if (user.role === 'creator'){
+                opponent.choice = snapshot.val()
+                if (user.choice !== ''){
+                    console.log('run');
+                    displayResult(showGameResults());
+                } else {
+                    console.log('run');
+                    app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+                }
+            }
+        }
+    });
+    database.ref('sessions/' + user.sessionuid + '/creator/choice').on('value',function(snapshot){
+        if (snapshot.val() !== ''){
+            if (user.role === 'joiner'){
+                opponent.choice = snapshot.val();
+                if (user.choice !== ''){
+                    console.log('run');
+                    displayResult(showGameResults());
+                } else {
+                    console.log('run');
+                    app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+                }
+            } else if (user.role === 'creator'){
+                user.choice = snapshot.val();
+                if (opponent.choice !== ''){
+                    console.log('run');
+                    displayResult(showGameResults());
+                } else {
+                    console.log('run');
+                    app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+                }
+            }
+        }
+    });
+}
 //TODO: listener on session closed to display game UI to both players
 //TODO: [NICE TO HAVE] listener should also somehow filters this session from the render for the other players
 //TODO: action that commit the choice
@@ -283,6 +371,7 @@ $(document).ready(function(){
         user.choice = $('#rps-choice').val();
         console.log(user.choice);
         database.ref('sessions/' + user.sessionuid + '/' + user.role + '/choice').set(user.choice);
+        listenToChoices();
     });
 
 });
