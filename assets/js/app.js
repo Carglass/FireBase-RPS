@@ -172,11 +172,13 @@ function listenToSessionsChanges (){
         if (creatorUid === user.uid){
             user.role = 'creator';
             opponent.role = 'joiner';
+            user.sessionuid = snapshot.key;
             app_view.setAppState(MAIN_APP_STATE.GAME);
         } else if (joinerUid === user.uid){
             user.role = 'joiner';
             opponent.role = 'creator';
             app_view.setAppState(MAIN_APP_STATE.GAME);
+            user.sessionuid = snapshot.key;
             // displays the game controls
         } //TODO: is it possible here to say to hide the session ?
     } 
