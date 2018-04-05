@@ -228,6 +228,15 @@ function displayResult(winner){
     app_view.setAppState(MAIN_APP_STATE.GAME_RESULTS);
 }
 
+function terminateSession(){
+    // only if user is creator to avoid two triggers
+    if (user.role === 'creator'){
+        database.ref('sessions/' + sessionUid).remove().then(function(){
+            $('finish-game-session').prop('disabled',false);
+        });
+    }
+}
+
 function listenToChoices(){
     database.ref('sessions/' + user.sessionuid + '/joiner/choice').on('value',function(snapshot){
         if (snapshot.val() !== ''){
@@ -236,6 +245,7 @@ function listenToChoices(){
                 if (opponent.choice !== ''){
                     console.log('run');
                     displayResult(showGameResults());
+                    terminateSession();
                 } else {
                     console.log('run');
                     app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
@@ -245,6 +255,7 @@ function listenToChoices(){
                 if (user.choice !== ''){
                     console.log('run');
                     displayResult(showGameResults());
+                    terminateSession();
                 } else {
                     console.log('run');
                     app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
@@ -259,6 +270,7 @@ function listenToChoices(){
                 if (user.choice !== ''){
                     console.log('run');
                     displayResult(showGameResults());
+                    terminateSession();
                 } else {
                     console.log('run');
                     app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
@@ -268,6 +280,7 @@ function listenToChoices(){
                 if (opponent.choice !== ''){
                     console.log('run');
                     displayResult(showGameResults());
+                    terminateSession();
                 } else {
                     console.log('run');
                     app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
