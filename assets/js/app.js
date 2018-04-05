@@ -219,11 +219,11 @@ function showGameResults(){
 function displayResult(winner){
     console.log(user);
     if (winner === 'user'){
-        $('#game-results').text('You Win!');
+        $('#result-label').text('You Win!');
     } else if (winner === 'opponent'){
-        $('#game-results').text('You lost :(');
+        $('#result-label').text('You lost :(');
     } else if (winner === 'draw'){
-        $('#game-results').text('Draw!');
+        $('#result-label').text('Draw!');
     }
     app_view.setAppState(MAIN_APP_STATE.GAME_RESULTS);
 }
