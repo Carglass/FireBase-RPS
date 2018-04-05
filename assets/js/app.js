@@ -232,7 +232,7 @@ function terminateSession(){
     console.log('I terminate');
     // only if user is creator to avoid two triggers
     if (user.role === 'creator'){
-        database.ref('sessions/' + user.sessionUid).remove().then(function(){
+        database.ref('sessions/' + user.sessionuid).remove().then(function(){
             $('finish-game-session').prop('disabled',false);
         });
     }
