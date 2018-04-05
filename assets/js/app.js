@@ -229,9 +229,10 @@ function displayResult(winner){
 }
 
 function terminateSession(){
+    console.log('I terminate');
     // only if user is creator to avoid two triggers
     if (user.role === 'creator'){
-        database.ref('sessions/' + sessionUid).remove().then(function(){
+        database.ref('sessions/' + user.sessionUid).remove().then(function(){
             $('finish-game-session').prop('disabled',false);
         });
     }
