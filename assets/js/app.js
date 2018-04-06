@@ -238,7 +238,7 @@ function terminateSession(){
 
 function listenToSessionsTerminated(){
     database.ref('sessions').on('child_removed',function(snapshot){
-        $('finish-game-session').prop('disabled',false);
+        $('#finish-game-session').prop('disabled',false);
     });
 }
 
@@ -395,6 +395,10 @@ $(document).ready(function(){
         console.log(user.choice);
         database.ref('sessions/' + user.sessionuid + '/' + user.role + '/choice').set(user.choice);
         listenToChoices();
+    });
+
+    $(document).on('click','#finish-game-session', function(){
+        app_view.setAppState(MAIN_APP_STATE.SESSIONS);
     });
 
 });
