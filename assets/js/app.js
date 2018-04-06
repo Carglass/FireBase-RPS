@@ -226,7 +226,6 @@ function displayResult(winner){
         $('#result-label').text('Draw!');
     }
     app_view.setAppState(MAIN_APP_STATE.GAME_RESULTS);
-    listenToSessionsTerminated();
 }
 
 function terminateSession(){
@@ -294,6 +293,7 @@ function listenToChoices(){
             }
         }
     });
+    listenToSessionsTerminated();
 }
 //TODO: listener on session closed to display game UI to both players
 //TODO: [NICE TO HAVE] listener should also somehow filters this session from the render for the other players
