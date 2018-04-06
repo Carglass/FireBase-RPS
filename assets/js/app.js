@@ -402,7 +402,7 @@ $(document).ready(function(){
     });
 
     $(document).on('click','#finish-game-session', function(){
-        $("div").find("[data-sessionUid='" + user.sessionuid + "']").remove();
+        $("div[data-sessionid='" + user.sessionuid + "'").remove();
         app_view.setAppState(MAIN_APP_STATE.SESSIONS);
     });
 
