@@ -226,6 +226,7 @@ function displayResult(winner){
         $('#result-label').text('Draw!');
     }
     app_view.setAppState(MAIN_APP_STATE.GAME_RESULTS);
+    listenToSessionsTerminated();
 }
 
 function terminateSession(){
