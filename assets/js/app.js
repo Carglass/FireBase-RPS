@@ -145,9 +145,11 @@ function listenToSessions(){
                 user.sessionuid = snapshot.key;
                 app_view.setAppState(MAIN_APP_STATE.WAITING_JOINER);
             } else {
+                let sessionDiv = $('<div data-sessionId="'+ snapshot.key +'"></div>')
                 let sessionName = $('<div>' + snapshot.val().creator.displayName + ' session</div>');
                 let joinButton = $('<button></button>').attr('id', snapshot.key).text('join Session').addClass('join-button');
-                $('#open-sessions').append(sessionName).append(joinButton);
+                sessionDiv.append(sessionName).append(joinButton);
+                $('#open-sessions').append(sessionDiv);
             }
         } else if (snapshot.val().state === 2){
             let joinerUid = snapshot.val().joiner.uid;
@@ -239,6 +241,7 @@ function terminateSession(){
 function listenToSessionsTerminated(){
     database.ref('sessions').on('child_removed',function(snapshot){
         $('#finish-game-session').prop('disabled',false);
+
     });
 }
 
@@ -399,6 +402,7 @@ $(document).ready(function(){
     });
 
     $(document).on('click','#finish-game-session', function(){
+        $("div").find("[data-sessionUid='" + user.sessionuid + "']").remove();
         app_view.setAppState(MAIN_APP_STATE.SESSIONS);
     });
 
