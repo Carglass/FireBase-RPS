@@ -9,7 +9,6 @@
 
 .choice-container input{
     display: none;
-    height: 40px;
 }
 
 .choice-container input:checked ~ .choice-icon{
