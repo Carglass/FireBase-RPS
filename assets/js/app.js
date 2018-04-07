@@ -1,4 +1,5 @@
 let database = firebase.database();
+var chatCount = 0;
 
 // used to track login status
 var LOGIN_STATE = {
@@ -331,8 +332,14 @@ function listenToChat(){
         let messageDiv = $('<div></div>');
         userNameDiv.text(snapshot.val().userDisplayName);
         messageDiv.text(snapshot.val().message);
-        newMessageDiv.append(userNameDiv).append(messageDiv);
-        $('#chat-messages').append(newMessageDiv).addClass('chat-message');
+        newMessageDiv.append(userNameDiv).append(messageDiv).addClass('chat-message');
+        $('#chat-messages').append(newMessageDiv);
+        chatCount++;
+        console.log(chatCount);
+        if (chatCount > 5){
+            $('#chat-messages .chat-message:nth-child(1)').remove();
+            chatCount--;
+        }
     })
 }
 
@@ -344,6 +351,7 @@ function treatChatMessage(event){
             message: chatInput,
         }
         database.ref('chat/messages').push(newChatMessage);
+        $('#chat-input-text').val('');     
 }
 
 $(document).ready(function(){
