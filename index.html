@@ -5,15 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
     <!-- signup page -->
     <div id="signup">
-        <button id="signup-close">Back to login</button>
+        <button id="signup-close" class="btn btn-secondary">Back to login</button>
         <div>Name: <input type="text" id="signup-name"></div>
         <div>Email: <input type="email" id="signup-email"></div>
         <div>Password: <input type="password" id="signup-password"></div>
-        <button id="signup-button">Sign Up</button>
+        <button id="signup-button" class="btn btn-primary">Sign Up</button>
     </div>
 
     
@@ -22,31 +25,45 @@
     <div id="login">
         <input type="email" id="login-email">
         <input type="password" id="login-password">
-        <button id="login-button">Login</button>
-        <button id="signup-open">Sign Up</button>
+        <button id="login-button" class="btn btn-primary">Login</button>
+        <button id="signup-open" class="btn btn-secondary">Sign Up</button>
     </div>
 
     <!-- main app -->
     <div id="main-app">
         <div id="logout">
             <div id="current-user"></div>
-            <button id="logout-button">Logout</button>
+            <button id="logout-button" class="btn btn-secondary">Logout</button>
         </div>
         <!-- sessions -->
         <div id="session-control">
-            <button id="create-game">Create Game</button>
+            <button id="create-game" class="btn btn-primary">Create Game</button>
             <div id="open-sessions"></div>
         </div>
         <!-- in sessions, waiting for joiner -->
         <div id="waiting-joiner">Waiting for someone to join</div>
         <!-- in game -->
         <div id="current-game">
-            <select id="rps-choice">
+            <div id="rps-choice">
+                <div class="choice-container">
+                    <input type="radio" name="choice" value="rock" id="rock"/>
+                    <label for="rock" class="choice-icon"><i class="fas fa-hand-rock"></i></label>
+                </div>
+                <div class="choice-container">
+                    <input type="radio" name="choice" value="paper" id="paper"/>
+                    <label for="paper" class="choice-icon"><i class="fas fa-hand-paper"></i></label>
+                </div>
+                <div class="choice-container">
+                    <input type="radio" name="choice" value="scisors" id="scisors"/>
+                    <label for="scisors" class="choice-icon"><i class="fas fa-hand-scissors"></i></label>
+                </div>
+            </div>
+            <!-- <select id="rps-choice">
                 <option value="rock">Rock</option>
                 <option value="paper">Paper</option>
                 <option value="scisors">Scisors</option>
-            </select>
-            <button id="confirm-choice">Confirm</button>
+            </select> -->
+            <button id="confirm-choice" class="btn btn-primary">Confirm</button>
             <div id="opponent-awaits"></div>
         </div>
         <!-- in game, waiting for the other to choose -->
@@ -54,7 +71,7 @@
         <!-- game results -->
         <div id="game-results">
             <div id="result-label"></div>
-            <button id="finish-game-session" disabled>Continue</button>
+            <button id="finish-game-session" class="btn btn-primary" disabled>Continue</button>
         </div>
     </div>
 

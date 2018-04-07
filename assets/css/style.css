@@ -1,0 +1,17 @@
+.choice-icon{
+    font-size: 3em;
+}
+
+.choice-container{
+    cursor: pointer;
+    user-select: none;
+}
+
+.choice-container input{
+    display: none;
+    height: 40px;
+}
+
+.choice-container input:checked ~ .choice-icon{
+    background-color: lightblue;
+}

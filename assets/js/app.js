@@ -151,7 +151,7 @@ function listenToSessions(){
             } else {
                 let sessionDiv = $('<div data-sessionId="'+ snapshot.key +'"></div>')
                 let sessionName = $('<div>' + snapshot.val().creator.displayName + ' session</div>');
-                let joinButton = $('<button></button>').attr('id', snapshot.key).text('join Session').addClass('join-button');
+                let joinButton = $('<button></button>').attr('id', snapshot.key).text('Join Session').addClass('join-button btn btn-primary');
                 sessionDiv.append(sessionName).append(joinButton);
                 $('#open-sessions').append(sessionDiv);
             }
@@ -410,7 +410,8 @@ $(document).ready(function(){
     //---------------//
 
     $(document).on('click','#confirm-choice', function(){
-        user.choice = $('#rps-choice').val();
+        // user.choice = $('#rps-choice').val();
+        user.choice = $('input[name=choice]:checked').val();
         console.log(user.choice);
         database.ref('sessions/' + user.sessionuid + '/' + user.role + '/choice').set(user.choice);
         // listenToChoices();
