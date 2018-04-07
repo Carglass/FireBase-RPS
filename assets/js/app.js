@@ -1,11 +1,13 @@
 let database = firebase.database();
 
+// used to track login status
 var LOGIN_STATE = {
     LOGIN: 1,
     SIGNUP: 2,
     LOGGED: 3,
 }
 
+// used to track UI status once logged
 var MAIN_APP_STATE = {
     SESSIONS: 1,
     WAITING_JOINER: 2,
@@ -106,6 +108,7 @@ var user = {
 
 var opponent = {
     role: '',
+    // could be used to inform the user that the opponent has made his choice
     hasChosen: false,
     choice: '',
 }
@@ -128,6 +131,7 @@ firebase.auth().onAuthStateChanged(function (loggedUser) {
         opponent.role = '';
         opponent.hasChosen = false;
         opponent.choice = '';
+        $('#open-sessions').empty();
     }
 });
 
@@ -176,18 +180,35 @@ function listenToSessionsChanges (){
             opponent.role = 'joiner';
             user.sessionuid = snapshot.key;
             app_view.setAppState(MAIN_APP_STATE.GAME);
+            user.choice = snapshot.val().creator.choice;
+            opponent.choice = snapshot.val().joiner.choice;
+            if (user.choice !== '' && opponent.choice !== ''){
+                displayResult(getWinner());
+                terminateSession();
+                listenToSessionsTerminated();
+            } else if (user.choice !== ''){
+                app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+            }
         } else if (joinerUid === user.uid){
             user.role = 'joiner';
             opponent.role = 'creator';
             app_view.setAppState(MAIN_APP_STATE.GAME);
             user.sessionuid = snapshot.key;
-            // displays the game controls
+            user.choice = snapshot.val().joiner.choice;
+            opponent.choice = snapshot.val().creator.choice;
+            if (user.choice !== '' && opponent.choice !== ''){
+                displayResult(getWinner());
+                terminateSession();
+                listenToSessionsTerminated();
+            } else if (user.choice !== ''){
+                app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+            }
         } //TODO: is it possible here to say to hide the session ?
     } 
     });
 }
 
-function showGameResults(){
+function getWinner(){
     console.log('game has ended');
     console.log(user.choice);
     console.log(opponent.choice);
@@ -245,65 +266,59 @@ function listenToSessionsTerminated(){
     });
 }
 
-function listenToChoices(){
-    database.ref('sessions/' + user.sessionuid + '/joiner/choice').on('value',function(snapshot){
-        if (snapshot.val() !== ''){
-            if (user.role === 'joiner'){
-                user.choice = snapshot.val();
-                if (opponent.choice !== ''){
-                    console.log('run');
-                    displayResult(showGameResults());
-                    terminateSession();
-                } else {
-                    console.log('run');
-                    app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
-                }
-            } else if (user.role === 'creator'){
-                opponent.choice = snapshot.val()
-                if (user.choice !== ''){
-                    console.log('run');
-                    displayResult(showGameResults());
-                    terminateSession();
-                } else {
-                    console.log('run');
-                    app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
-                }
-            }
-        }
-    });
-    database.ref('sessions/' + user.sessionuid + '/creator/choice').on('value',function(snapshot){
-        if (snapshot.val() !== ''){
-            if (user.role === 'joiner'){
-                opponent.choice = snapshot.val();
-                if (user.choice !== ''){
-                    console.log('run');
-                    displayResult(showGameResults());
-                    terminateSession();
-                } else {
-                    console.log('run');
-                    app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
-                }
-            } else if (user.role === 'creator'){
-                user.choice = snapshot.val();
-                if (opponent.choice !== ''){
-                    console.log('run');
-                    displayResult(showGameResults());
-                    terminateSession();
-                } else {
-                    console.log('run');
-                    app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
-                }
-            }
-        }
-    });
-    listenToSessionsTerminated();
-}
-//TODO: listener on session closed to display game UI to both players
-//TODO: [NICE TO HAVE] listener should also somehow filters this session from the render for the other players
-//TODO: action that commit the choice
-//TODO: listener on choice, that triggers the result display
-//TODO: clicking on quit session brings back to the menu
-//TODO: once both users have clicked on the session, the session is killed
+// function listenToChoices(){
+//     database.ref('sessions/' + user.sessionuid + '/joiner/choice').on('value',function(snapshot){
+//         if (snapshot.val() !== ''){
+//             if (user.role === 'joiner'){
+//                 user.choice = snapshot.val();
+//                 if (opponent.choice !== ''){
+//                     console.log('run');
+//                     displayResult(getWinner());
+//                     terminateSession();
+//                 } else {
+//                     console.log('run');
+//                     app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+//                 }
+//             } else if (user.role === 'creator'){
+//                 opponent.choice = snapshot.val()
+//                 if (user.choice !== ''){
+//                     console.log('run');
+//                     displayResult(getWinner());
+//                     terminateSession();
+//                 } else {
+//                     console.log('run');
+//                     app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+//                 }
+//             }
+//         }
+//     });
+//     database.ref('sessions/' + user.sessionuid + '/creator/choice').on('value',function(snapshot){
+//         if (snapshot.val() !== ''){
+//             if (user.role === 'joiner'){
+//                 opponent.choice = snapshot.val();
+//                 if (user.choice !== ''){
+//                     console.log('run');
+//                     displayResult(getWinner());
+//                     terminateSession();
+//                 } else {
+//                     console.log('run');
+//                     app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+//                 }
+//             } else if (user.role === 'creator'){
+//                 user.choice = snapshot.val();
+//                 if (opponent.choice !== ''){
+//                     console.log('run');
+//                     displayResult(getWinner());
+//                     terminateSession();
+//                 } else {
+//                     console.log('run');
+//                     app_view.setAppState(MAIN_APP_STATE.WAITING_CHOICE);
+//                 }
+//             }
+//         }
+//     });
+//     listenToSessionsTerminated();
+// }
 
 $(document).ready(function(){
 
@@ -398,7 +413,7 @@ $(document).ready(function(){
         user.choice = $('#rps-choice').val();
         console.log(user.choice);
         database.ref('sessions/' + user.sessionuid + '/' + user.role + '/choice').set(user.choice);
-        listenToChoices();
+        // listenToChoices();
     });
 
     $(document).on('click','#finish-game-session', function(){
