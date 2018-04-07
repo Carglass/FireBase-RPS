@@ -104,6 +104,7 @@ var user = {
     role: '',
     choice: '',
     sessionuid: '',
+    displayName: '',
 }
 
 var opponent = {
@@ -118,16 +119,19 @@ var opponent = {
 firebase.auth().onAuthStateChanged(function (loggedUser) {
     if (loggedUser) {
         user.uid = loggedUser.uid;
+        user.displayName = loggedUser.displayName;
         $('#current-user').text(firebase.auth().currentUser.displayName + ' is connected');
         app_view.setLoginState(LOGIN_STATE.LOGGED);
         app_view.setAppState(MAIN_APP_STATE.SESSIONS);
         listenToSessions();
         listenToSessionsChanges();
+        listenToChat();
     } else {
         app_view.setLoginState(LOGIN_STATE.LOGIN);
         user.uid = '';
         user.role = '';
         user.choice = '';
+        user.displayName = '';
         opponent.role = '';
         opponent.hasChosen = false;
         opponent.choice = '';
@@ -320,6 +324,28 @@ function listenToSessionsTerminated(){
 //     listenToSessionsTerminated();
 // }
 
+function listenToChat(){
+    database.ref('chat/messages').on('child_added', function(snapshot){
+        let newMessageDiv = $('<div></div>');
+        let userNameDiv = $('<div></div>');
+        let messageDiv = $('<div></div>');
+        userNameDiv.text(snapshot.val().userDisplayName);
+        messageDiv.text(snapshot.val().message);
+        newMessageDiv.append(userNameDiv).append(messageDiv);
+        $('#chat-messages').append(newMessageDiv).addClass('chat-message');
+    })
+}
+
+function treatChatMessage(event){
+        let chatInput = $('#chat-input-text').val();
+        let newChatMessage = {
+            userId: user.uid,
+            userDisplayName: user.displayName,
+            message: chatInput,
+        }
+        database.ref('chat/messages').push(newChatMessage);
+}
+
 $(document).ready(function(){
 
     //-----------------//
@@ -420,6 +446,20 @@ $(document).ready(function(){
     $(document).on('click','#finish-game-session', function(){
         $("div[data-sessionid='" + user.sessionuid + "'").remove();
         app_view.setAppState(MAIN_APP_STATE.SESSIONS);
+    });
+
+    //---------------//
+    // CHAT CONTROLS //
+    //---------------//
+
+    $(document).on('keydown','#chat-input-text', function(event){
+        if (event.keyCode == 13) {
+            treatChatMessage();
+        }
+    });
+
+    $(document).on('click','#chat-input-submit',function(event){
+        treatChatMessage();
     });
 
 });

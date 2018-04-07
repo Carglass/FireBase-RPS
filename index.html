@@ -23,7 +23,9 @@
 
     <!-- login page  -->
     <div id="login">
+        <label for="login-email">Email</label>
         <input type="email" id="login-email">
+        <label for="login-password">Password</label>
         <input type="password" id="login-password">
         <button id="login-button" class="btn btn-primary">Login</button>
         <button id="signup-open" class="btn btn-secondary">Sign Up</button>
@@ -72,6 +74,13 @@
         <div id="game-results">
             <div id="result-label"></div>
             <button id="finish-game-session" class="btn btn-primary" disabled>Continue</button>
+        </div>
+        <div id="chat">
+            <div id="chat-messages"></div>
+            <div id="chat-input">
+                <input type="text" id="chat-input-text" placeholder="Your message">
+                <button id="chat-input-submit">Send</button>
+            </div>
         </div>
     </div>
 
