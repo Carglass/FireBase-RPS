@@ -1,11 +1,13 @@
 let database = firebase.database();
 
+// used to track login status
 var LOGIN_STATE = {
     LOGIN: 1,
     SIGNUP: 2,
     LOGGED: 3,
 }
 
+// used to track UI status once logged
 var MAIN_APP_STATE = {
     SESSIONS: 1,
     WAITING_JOINER: 2,
@@ -106,6 +108,7 @@ var user = {
 
 var opponent = {
     role: '',
+    // could be used to inform the user that the opponent has made his choice
     hasChosen: false,
     choice: '',
 }
@@ -128,6 +131,7 @@ firebase.auth().onAuthStateChanged(function (loggedUser) {
         opponent.role = '';
         opponent.hasChosen = false;
         opponent.choice = '';
+        $('#open-sessions').empty();
     }
 });
 
