@@ -106,6 +106,8 @@ var user = {
     choice: '',
     sessionuid: '',
     displayName: '',
+    wins: 0,
+    losses: 0,
 }
 
 var opponent = {
@@ -133,6 +135,8 @@ firebase.auth().onAuthStateChanged(function (loggedUser) {
         user.role = '';
         user.choice = '';
         user.displayName = '';
+        user.wins = 0;
+        user.losses = 0;
         opponent.role = '';
         opponent.hasChosen = false;
         opponent.choice = '';
