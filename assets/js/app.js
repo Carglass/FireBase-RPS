@@ -179,7 +179,7 @@ function listenToSessionsChanges (){
             user.choice = snapshot.val().creator.choice;
             opponent.choice = snapshot.val().joiner.choice;
             if (user.choice !== '' && opponent.choice !== ''){
-                displayResult(showGameResults());
+                displayResult(getWinner());
                 terminateSession();
                 listenToSessionsTerminated();
             } else if (user.choice !== ''){
@@ -193,7 +193,7 @@ function listenToSessionsChanges (){
             user.choice = snapshot.val().joiner.choice;
             opponent.choice = snapshot.val().creator.choice;
             if (user.choice !== '' && opponent.choice !== ''){
-                displayResult(showGameResults());
+                displayResult(getWinner());
                 terminateSession();
                 listenToSessionsTerminated();
             } else if (user.choice !== ''){
@@ -204,7 +204,7 @@ function listenToSessionsChanges (){
     });
 }
 
-function showGameResults(){
+function getWinner(){
     console.log('game has ended');
     console.log(user.choice);
     console.log(opponent.choice);
@@ -269,7 +269,7 @@ function listenToSessionsTerminated(){
 //                 user.choice = snapshot.val();
 //                 if (opponent.choice !== ''){
 //                     console.log('run');
-//                     displayResult(showGameResults());
+//                     displayResult(getWinner());
 //                     terminateSession();
 //                 } else {
 //                     console.log('run');
@@ -279,7 +279,7 @@ function listenToSessionsTerminated(){
 //                 opponent.choice = snapshot.val()
 //                 if (user.choice !== ''){
 //                     console.log('run');
-//                     displayResult(showGameResults());
+//                     displayResult(getWinner());
 //                     terminateSession();
 //                 } else {
 //                     console.log('run');
@@ -294,7 +294,7 @@ function listenToSessionsTerminated(){
 //                 opponent.choice = snapshot.val();
 //                 if (user.choice !== ''){
 //                     console.log('run');
-//                     displayResult(showGameResults());
+//                     displayResult(getWinner());
 //                     terminateSession();
 //                 } else {
 //                     console.log('run');
@@ -304,7 +304,7 @@ function listenToSessionsTerminated(){
 //                 user.choice = snapshot.val();
 //                 if (opponent.choice !== ''){
 //                     console.log('run');
-//                     displayResult(showGameResults());
+//                     displayResult(getWinner());
 //                     terminateSession();
 //                 } else {
 //                     console.log('run');
