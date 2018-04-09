@@ -108,6 +108,14 @@ var user = {
     displayName: '',
     wins: 0,
     losses: 0,
+    setWins: function(newNb){
+        this.wins = newNb;
+        $('#user-wins').text(this.wins);
+    },
+    setLosses: function(newNb){
+        this.losses = newNb;
+        $('user-losses').text(this.losses);
+    }
 }
 
 var opponent = {
@@ -129,6 +137,7 @@ firebase.auth().onAuthStateChanged(function (loggedUser) {
         listenToSessions();
         listenToSessionsChanges();
         listenToChat();
+        listenToUserStats();
     } else {
         app_view.setLoginState(LOGIN_STATE.LOGIN);
         user.uid = '';
@@ -143,6 +152,15 @@ firebase.auth().onAuthStateChanged(function (loggedUser) {
         $('#open-sessions').empty();
     }
 });
+
+function listenToUserStats(){
+    database.ref('users/' + user.uid).on('value', function(snapshot){
+        let updatedWins = snapshot.val().wins;
+        let updatedLosses = snapshot.val().losses;
+        user.setWins(updatedWins);
+        user.setLosses(updatedLosses);
+    });
+}
 
 //listener on new game session created
 //FIXME: right after a game is created, if another user logs from the same computer, he can still log somehow
@@ -252,8 +270,10 @@ function displayResult(winner){
     console.log(user);
     if (winner === 'user'){
         $('#result-label').text('You Win!');
+        database.ref('users/' + user.uid).set({wins: user.wins++, losses: user.losses});
     } else if (winner === 'opponent'){
         $('#result-label').text('You lost :(');
+        database.ref('users/' + user.uid).set({wins: user.wins, losses: user.losses++});
     } else if (winner === 'draw'){
         $('#result-label').text('Draw!');
     }
