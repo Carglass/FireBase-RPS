@@ -406,7 +406,7 @@ $(document).ready(function(){
               $('#signup-name').val('');
               $('#signup-email').val('');
               $('#signup-password').val('');
-              database.ref('user/' + user.uid).set({wins: 0,losses: 0});
+              database.ref('users/' + user.uid).set({wins: 0,losses: 0});
           });
     });
 
