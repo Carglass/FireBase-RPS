@@ -114,7 +114,7 @@ var user = {
     },
     setLosses: function(newNb){
         this.losses = newNb;
-        $('user-losses').text(this.losses);
+        $('#user-losses').text(this.losses);
     }
 }
 
