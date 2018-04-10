@@ -289,7 +289,7 @@ function terminateSession(){
 }
 
 function listenToSessionsTerminated(){
-    database.ref('sessions').on('child_removed',function(snapshot){
+    database.ref('sessions' + user.sessionuid).on('child_removed',function(snapshot){
         $('#finish-game-session').prop('disabled',false);
 
     });
